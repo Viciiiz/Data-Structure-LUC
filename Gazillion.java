@@ -135,7 +135,7 @@ public class Gazillion {
         String currentMult; // will serve as a parameter of the Gazillion(String s) constructor, which will be used when the add(Gazillion gazillion) method is called.
         Boolean thisIsNegative; // check if this gazillion is negative
         Boolean gazillionIsNegative; // check if the gazillion in the parameter is negative
-
+        String alpha;
 
         // check if the gazillions are negative
         gazillionIsNegative = isNegative(gazillion);
@@ -155,8 +155,9 @@ public class Gazillion {
             carry = 0; // initial value of carry
 
             // we are adding the indent needed for each multiplication
-            indent = (int) Math.pow(10,i);
-            for (int k = 0; k < Integer.toString(indent).length()-1; k++) {
+            alpha = "0".repeat(i);
+            indent = alpha.length();
+            for (int k = 0; k < indent; k++) {
                 current.add(0); // add zero to current as the indent
             }
 
@@ -239,14 +240,14 @@ public class Gazillion {
 
     /** Driver */
     public static void main(String[] args) {
-        Gazillion a = new Gazillion("998");
-        Gazillion b = new Gazillion("4");
+        Gazillion a = new Gazillion("9798298283984209823944820970792685297384298249828402");
+        Gazillion b = new Gazillion("2424245242988922424339283493752037827348728782472787");
         a.add(b);
         System.out.println(a.toString());
 
         // test multiply
-        Gazillion c = new Gazillion("oi8uy-7077");
-        Gazillion d = new Gazillion("819");
+        Gazillion c = new Gazillion("9798298283984209823944820970792685297384298249828402");
+        Gazillion d = new Gazillion("2424245242988922424339283493752037827348728782472787");
         c.multiply(d);
         System.out.println(c.toString());
 
