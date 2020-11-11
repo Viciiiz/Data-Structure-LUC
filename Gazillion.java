@@ -133,8 +133,8 @@ public class Gazillion {
         int carry;
         int indent; // as we multiply, the numbers that are added together are indented to the left by one space
         String currentMult; // will serve as a parameter of the Gazillion(String s) constructor, which will be used when the add(Gazillion gazillion) method is called.
-        Boolean thisIsNegative = false; // check if this gazillion is negative
-        Boolean gazillionIsNegative = false; // check if the gazillion in the parameter is negative
+        Boolean thisIsNegative; // check if this gazillion is negative
+        Boolean gazillionIsNegative; // check if the gazillion in the parameter is negative
 
 
         // check if the gazillions are negative
