@@ -136,13 +136,10 @@ public class Gazillion {
         Boolean thisIsNegative = false; // check if this gazillion is negative
         Boolean gazillionIsNegative = false; // check if the gazillion in the parameter is negative
 
+
         // check if the gazillions are negative
-        if(gazillion.value.charAt(0)=='-'){
-            gazillionIsNegative = true;
-        }
-        if(this.value.charAt(0)=='-'){
-            thisIsNegative = true;
-        }
+        gazillionIsNegative = isNegative(gazillion);
+        thisIsNegative = isNegative(this);
 
         // store the result in the digits of this Gazillion
         Gazillion multiplication = new Gazillion("0");
@@ -217,6 +214,29 @@ public class Gazillion {
     } // method multiply
 
 
+    /**
+     * Method to check if a gazillion is negative
+     * A number is negative when there is at least one "-" anywhere before the first digit of the number
+     * @param gazillion is the gazillion to be checked
+     * @return true if negative
+     */
+    public boolean isNegative(Gazillion gazillion){
+        Boolean isNeg = false;
+        int countNonDigit = 0;
+        if(gazillion.value.contains("-")){
+            for (int i = 0; i < gazillion.value.indexOf("-"); i++){
+                if(!Character.isDigit(gazillion.value.charAt(i))){
+                    countNonDigit++;
+                }
+            }
+            if ( countNonDigit == gazillion.value.indexOf("-")){
+                isNeg = true;
+            }
+        }
+        return isNeg;
+    }
+
+
     /** Driver */
     public static void main(String[] args) {
         Gazillion a = new Gazillion("998");
@@ -225,15 +245,16 @@ public class Gazillion {
         System.out.println(a.toString());
 
         // test multiply
-        Gazillion c = new Gazillion("87077");
+        Gazillion c = new Gazillion("oi8uy-7077");
         Gazillion d = new Gazillion("819");
         c.multiply(d);
         System.out.println(c.toString());
 
-        // test multiply (for negative numbers)
-        Gazillion e = new Gazillion("-87077");
-        Gazillion f = new Gazillion("819");
+        // test multiply (for negative numbers: A number is negative when there is at least one "-" anywhere before the first digit of the number)
+        Gazillion e = new Gazillion("o-i8uy-7077");
+        Gazillion f = new Gazillion("0-i-819");
         e.multiply(f);
         System.out.println(e.toString());
-    }
+
+    } // main
 } // class Gazillion
