@@ -554,6 +554,7 @@ public class Gazillion {
         }
 */
 
+        Gazillion product;
        //length of the gazillion
         int N = x.digits.size();
         Gazillion a,b,c,d,ac,ad,bc,bd,p,q,pq;
@@ -566,13 +567,12 @@ public class Gazillion {
         System.out.println("N: " + N);
 
         if(N == 1){
-            x.multiply(y);
-            return x;
+            product = multiplier(x,y);
         } else {
             int powerOfTen = (int) Math.pow(10,N/2);
             // separate halves
             for(int i = 0; i < N; i++){
-                if(i<=(int)Math.ceil(N/2)){
+                if(i<(int)Math.ceil(N/2)){
                     AA.add(x.digits.get(i));
                     CC.add(y.digits.get(i));
                 } else {
@@ -635,11 +635,13 @@ public class Gazillion {
 
             return add3;*/
             // recursive calls
-            ac = RecursiveMultiplication(a,c);
-            bd = RecursiveMultiplication(b,d);
-            p = adder(a,b);
-            q = adder(c,d);
-            pq = RecursiveMultiplication(p,q);
+            ac = RecursiveMultiplication(new Gazillion(AA.toString()),new Gazillion(BB.toString()));
+            bd = RecursiveMultiplication(new Gazillion(CC.toString()),new Gazillion(DD.toString()));
+            ad = RecursiveMultiplication(new Gazillion(AA.toString()),new Gazillion(DD.toString()));
+            bc = RecursiveMultiplication(new Gazillion(BB.toString()),new Gazillion(CC.toString()));
+          //  p = adder(a,b);
+          //  q = adder(c,d);
+           // pq = RecursiveMultiplication(p,q);
 
             // convert the powerOfTen to a gazillion
             Gazillion P1 = new Gazillion(Integer.toString(powerOfTen));
@@ -648,17 +650,27 @@ public class Gazillion {
             Gazillion mul1,mul2,mul3,sub1,sub2,add1,add2;
             mul1 = multiplier(P1, P1);      // powerOfTen * powerOfTen
             mul2 = multiplier(mul1, ac);    // powerOfTen * powerOfTen * ac
-            sub1 = subGaz(pq,ac);           // pq - ac
-            sub2 = subGaz(sub1,bd);         // pq - ac - bd
-            mul3 = multiplier(P1, sub2);    // powerOfTen * ( pq - ac - bd )
-            add1 = adder(mul2,mul3);        // powerOfTen * powerOfTen * ac + powerOfTen * ( pq - ac - bd )
-            add2 = adder(add1,bd);          // powerOfTen * powerOfTen * ac + powerOfTen * ( pq - ac - bd ) + bd
+            //sub1 = subGaz(pq,ac);           // pq - ac
+           // sub2 = subGaz(sub1,bd);         // pq - ac - bd
+           // mul3 = multiplier(P1, sub2);    // powerOfTen * ( pq - ac - bd )
+            //add1 = adder(mul2,mul3);        // powerOfTen * powerOfTen * ac + powerOfTen * ( pq - ac - bd )
+            //add2 = adder(add1,bd);          // powerOfTen * powerOfTen * ac + powerOfTen * ( pq - ac - bd ) + bd
 
-            return add2;
+            Gazillion addA,addB,addC,mul4;
+            addA = adder(ad,bc);  // ad + bc
+            mul4 = multiplier(P1,addA); // powerOf10 * ( ad + bc )
+            addB = adder(mul2,mul4); // powerOfTen * powerOfTen * ac + powerOf10 * ( ad + bc )
+            addC = adder(addB,bd); //powerOfTen * powerOfTen * ac + powerOf10 * ( ad + bc ) + bd
+
+            product = addC;
+
+            // powerOf10*powerOf10*ac + powerOf10*(ad+bc) + bd
+            //product = add2;
             //powerOfTen*powerOfTen*ac + powerOfTen*(pq-ac-bd) + bd
         }
-       // return product;
-       // return null;
+
+       return product;
+
     } // method RecursiveMultiplication
 
 
