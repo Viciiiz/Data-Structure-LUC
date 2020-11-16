@@ -113,97 +113,6 @@ public class Gazillion {
 
 
     /**
-     * Method to subtract two positive gazillions
-     * @param gazillion second operate to subtract
-     */
-    public void sub(Gazillion gazillion){
-        int partialSub;
-        final int BASE = 10;
-        int carry = 1;
-      //  int a = Integer.parseInt(this.pureValue);
-      //  int b = Integer.parseInt(gazillion.pureValue);
-
-        Gazillion greatest = null, smallest = null;
-        if(this.pureValue==gazillion.pureValue){ // if they have the same value, return 0
-            digits.clear();
-            digits.add(0);
-        } else {
-            // check which gazillion is greater
-            if(this.pureValue.length() <= 2 && gazillion.pureValue.length() <= 2){
-                int a = Integer.parseInt(this.pureValue);
-                int b = Integer.parseInt(gazillion.pureValue);
-                if (a<b){
-                    greatest = gazillion;
-                    smallest = this;
-                } else {
-                    greatest = this;
-                    smallest = gazillion;
-                }
-            } else if (this.pureValue.length() > 2 && gazillion.pureValue.length() <= 2){
-                greatest = this;
-                smallest = gazillion;
-            } else if (this.pureValue.length() <= 2 && gazillion.pureValue.length() > 2){
-                greatest = gazillion;
-                smallest = this;
-            } else {
-                if (this.pureValue.compareTo(gazillion.pureValue) < 0) {
-                    greatest = gazillion;
-                    smallest = this;
-                } else {
-                    greatest = this;
-                    smallest = gazillion;
-                }
-            } // end of <<check which is greater>>
-
-            ArrayList<Integer> subDigits = new ArrayList<Integer>(); // store the subtraction result here
-
-            // initialize the elements of the arrayList to 0
-            for(int i = 0; i < greatest.pureValue.length(); i++){
-                subDigits.add(i, 0);
-            }
-
-            // subtract
-            for(int i = 0; i < greatest.pureValue.length(); i++){
-                // if in current subtraction of two numbers a[] and b[], if a[i] is smaller than b[i], add 10 to a[i] and add a carry=1 to b[i+1]
-                // We will subtract the next current subtraction with the carry of that index if any.
-                if (greatest.least(i)<smallest.least(i)) {
-                    partialSub = greatest.least(i)+BASE-smallest.least(i);
-                    subDigits.set(i,partialSub-subDigits.get(i));
-                    subDigits.set(i+1, carry);
-                } else {
-                    // else, just do the subtraction
-                    partialSub = greatest.least(i) -smallest.least(i);
-                    subDigits.set(i,partialSub-subDigits.get(i));
-                }
-            }
-
-            Collections.reverse(subDigits); // reverse arrayList
-            digits = subDigits;
-            // remove the zeros at the beginning of the arrayList
-            for(int i = 0 ; i < digits.size(); i++){
-                if(digits.get(i)==0){
-                    digits.remove(i);
-                } else {
-                    break;
-                }
-            }
-
-            // if all zeros, just return 0
-            int count = 0;
-            for (int i = 0; i < digits.size(); i++){
-                if (digits.get(i)==0){
-                    count++;
-                }
-            }
-            if (count == digits.size()){
-                digits.clear();
-                digits.add(0,0);
-            }
-        }
-    } // method sub
-
-
-    /**
      * Method to obtain the i-th digit
      * @param i position of digit
      * @return digit
@@ -358,20 +267,10 @@ public class Gazillion {
      * @return a gazillion that is the sum of the two above
      */
     public Gazillion adder(Gazillion a, Gazillion b){
-        a.add(b);
-        return a;
-    }
-
-
-    /***
-     * Method to return a Gazillion using the sub() method
-     * @param a first Gazillion
-     * @param b second Gazillion
-     * @return a gazillion that is the difference of the two above (positive only)
-     */
-    public Gazillion subGaz(Gazillion a, Gazillion b){
-        a.sub(b);
-        return a;
+        Gazillion store = new Gazillion("0"); // so that the value of a is unchanged
+        store.add(a);
+        store.add(b);
+        return store;
     }
 
 
@@ -382,8 +281,10 @@ public class Gazillion {
      * @return a gazillion that is the product of the two above
      */
     public Gazillion multiplier(Gazillion a, Gazillion b){
-        a.multiply(b);
-        return a;
+        Gazillion store = new Gazillion("1"); // so that the value of a is not changed
+        store.multiply(a);
+        store.multiply(b);
+        return store;
     }
 
     /**
@@ -421,155 +322,28 @@ public class Gazillion {
      * @param y Gazillion operand
      * @return product x*y as a Gazillion object
      */
-
- //   private ArrayList A = new ArrayList();
-   // private ArrayList B = new ArrayList();
-   // private ArrayList C = new ArrayList();
- //   private ArrayList D = new ArrayList();
-
     public Gazillion RecursiveMultiplication(Gazillion x, Gazillion y) {
-    /*   // Gazillion product = null;
-        // work you code magic here!
-        // access the gazillions' values as an arrayList
-        ArrayList<Integer> first = x.digits;
-        ArrayList<Integer> second = y.digits;
 
-        //System.out.println("hereeee: "+first);
-
-        Gazillion a,b,c,d,ac,ad,bc,bd;
-        ArrayList A,B,C,D;
-        A = new ArrayList();
-      //  System.out.println("A : " + A);
-        B = new ArrayList();
-        C = new ArrayList();
-        D = new ArrayList();
-
-        // find the length of the two gazillions (number of digits)
-        int firstLen = first.size(); // N
-       // System.out.println(firstLen);
-        int secondLen = second.size(); // M
-
-        if(x.digits.size() == 1 && y.digits.size() == 1){
-            x.multiply(y);
-            return x;
-        } else {
-            int powerOfTen1 = (int) Math.pow(10,firstLen/2);
-            int powerOfTen2 = (int) Math.pow(10,secondLen/2);
-            // here, for the first gazillion (because the two gazillions may not have the same length)
-            if(firstLen!=1){
-                A.clear();
-                B.clear();
-                //int powerOfTen1 = (int) Math.pow(10,firstLen/2);
-                int halfOfX = (int) Math.ceil(firstLen/2.0); // half of the number of digits of the first gazillion
-                // assign first half of the first gazillion to A, and the second half of the first gazillion to B
-                for(int i = 0; i < firstLen; i++){
-                    int current = first.get(i);
-                    if(i<halfOfX){
-                        A.add(current);
-                    } else {
-                        B.add(current);
-                    }
-                } // rof
-            }
-
-            // here, for the second gazillion (because the two gazillions may not have the same length)
-            if(secondLen!=1){
-                C.clear();
-                D.clear();
-                //int powerOfTen2 = (int) Math.pow(10,secondLen/2);
-                int halfOfY = (int) Math.ceil(secondLen/2.0); // half of the number of digits of the second gazillion
-                // assign first half of the second gazillion to A, and the second half of the second gazillion to B
-                for(int i = 0; i < secondLen; i++){
-                    int current = second.get(i);
-                    if(i<halfOfY){
-                        C.add(current);
-                    } else {
-                        D.add(current);
-                    }
-                } // rof
-            }
-
-            a = new Gazillion(A.toString());
-            System.out.println("addeeedd a: " + a.toString());
-            b = new Gazillion(B.toString());
-            System.out.println("addeeedd b: " + b.toString());
-            c = new Gazillion(C.toString());
-            System.out.println("addeeedd c: " + c.toString());
-            d = new Gazillion(D.toString());
-            System.out.println("addeeedd d: " + d.toString() + "\n\n");
-
-            if(a.digits.size()==1 && b.digits.size()==1 && c.digits.size()==1 && d.digits.size()==1){
-                Gazillion storeA, storeB;
-                storeA = a;
-                storeB = b;
-                a.multiply(c);
-                ac = a;
-                storeA.multiply(d);
-                ad = storeA;
-                b.multiply(c);
-                bc = b;
-                storeB.multiply(d);
-                bd = storeB;
-
-            } else {
-                ac = RecursiveMultiplication(a, c);
-                ad = RecursiveMultiplication(a, d);
-                bc = RecursiveMultiplication(b, c);
-                bd = RecursiveMultiplication(b, d);
-            }
-
-            System.out.println("ac: " + ac);
-            System.out.println("ad: " + ad);
-            System.out.println("bc: " + bc);
-            System.out.println("bd: " + bd + "\n\n");
-
-            System.out.println(powerOfTen1);
-            System.out.println(powerOfTen2+"\n\n");
-
-            // convert the powers of ten to strings
-            String power1 = Integer.toString(powerOfTen1);
-            String power2 = Integer.toString(powerOfTen2);
-
-            // gazillions to store the two powers of ten
-            Gazillion P1,P2;
-            P1 = new Gazillion(power1);
-            P2 = new Gazillion(power2);
-
-            // gazillions to store the operations in the return statement
-            Gazillion mul1,mul2,mul3,add1,add2,add3;
-            P1.multiply(P2);
-            mul1 = P1;      // P1 * P2 = mul1
-            mul1.multiply(ac);
-            mul2 = mul1;    // P1 * P2 * ac = mul2
-            ad.add(bc);
-            add1 = ad;      // ad + bc = add1
-            P2.multiply(add1);
-            mul3 = P2;      // P2 * (ad + bc) = mul3
-            bd.add(mul3);
-            add2 = bd;      // P2 * (ad + bc) + bd = add2
-            mul2.add(add2);
-            add3 = mul2;    // P1 * P2 * ac + P2 * (ad + bc) + bd = add3
-
-            return add3;
-        }
-*/
-
+        // the output
         Gazillion product;
-       //length of the gazillion
+
+        //length of the gazillions
         int N = x.digits.size();
-        Gazillion a,b,c,d,ac,ad,bc,bd,p,q,pq;
+        Gazillion a,b,c,d,ac,ad,bc,bd;
         ArrayList AA,BB,CC,DD;
-        AA = new ArrayList();
-        BB = new ArrayList();
-        CC = new ArrayList();
-        DD = new ArrayList();
 
-        System.out.println("N: " + N);
-
+        //base case
         if(N == 1){
             product = multiplier(x,y);
-        } else {
+        } else { // recursive calls
             int powerOfTen = (int) Math.pow(10,N/2);
+
+            Gazillion P1 = new Gazillion(Integer.toString(powerOfTen));
+            AA = new ArrayList();
+            BB = new ArrayList();
+            CC = new ArrayList();
+            DD = new ArrayList();
+
             // separate halves
             for(int i = 0; i < N; i++){
                 if(i<(int)Math.ceil(N/2)){
@@ -580,93 +354,29 @@ public class Gazillion {
                     DD.add(y.digits.get(i));
                 }
             }
-            System.out.println("AA= "+AA);
-            System.out.println("BB= "+BB);
-            System.out.println("CC= "+CC);
-            System.out.println("DD= "+DD+"\n");
 
             // put the halves back in gazillions
             a = new Gazillion(AA.toString());
             b = new Gazillion(BB.toString());
             c = new Gazillion(CC.toString());
             d = new Gazillion(DD.toString());
-           // System.out.println("a= "+a);
-           // System.out.println("b= "+b);
-           // System.out.println("c= "+c);
-            //System.out.println("d= "+d+"\n");
 
-         /*   // recursive calls
-            ac = RecursiveMultiplication(a,c);
-            System.out.println("ac= "+ac);
-            //a = new Gazillion(AA.toString());
-            ad = RecursiveMultiplication(a,d);
-            System.out.println("ad= "+ad);
-           // c = new Gazillion(CC.toString());
-            bc = RecursiveMultiplication(b,c);
-            System.out.println("bc= "+bc);
-           // b = new Gazillion(BB.toString());
-           // d = new Gazillion(DD.toString());
-            bd = RecursiveMultiplication(b,d);
-            System.out.println("bd= "+bd+"\n");
-
-            // calculations
-            Gazillion mul1,mul2,mul3,add1,add2,add3,P1,storeP1;
-            P1 = new Gazillion(Integer.toString(powerOfTen));
-            System.out.println("P1: "+P1.toString());
-            storeP1 = P1;
-            P1.multiply(P1);
-            System.out.println("P1*P1: " + P1.toString());
-            mul1 = P1;      // P1 * P1 = mul1
-            mul1.multiply(ac);
-            mul2 = mul1;    // P1 * P1 * ac = mul2
-            System.out.println("P1 * P1 * ac: " + mul2);
-            ad.add(bc);
-            add1 = ad;      // ad + bc = add1
-            System.out.println("ad + bc: " + add1);
-            storeP1.multiply(add1);
-            mul3 = storeP1;      // P1 * (ad + bc) = mul3
-            System.out.println("P1 * (ad + bc): " + mul3);
-            bd.add(mul3);
-            add2 = bd;      // P1 * (ad + bc) + bd = add2
-            System.out.println("P1 * (ad + bc) + bd: " + add2);
-            mul2.add(add2);
-            add3 = mul2;    // P1 * P1 * ac + P1 * (ad + bc) + bd = add3
-            System.out.println("P1 * P1 * ac + P1 * (ad + bc) + bd: " + add3);
-
-            return add3;*/
             // recursive calls
-            ac = RecursiveMultiplication(new Gazillion(AA.toString()),new Gazillion(BB.toString()));
-            bd = RecursiveMultiplication(new Gazillion(CC.toString()),new Gazillion(DD.toString()));
-            ad = RecursiveMultiplication(new Gazillion(AA.toString()),new Gazillion(DD.toString()));
-            bc = RecursiveMultiplication(new Gazillion(BB.toString()),new Gazillion(CC.toString()));
-          //  p = adder(a,b);
-          //  q = adder(c,d);
-           // pq = RecursiveMultiplication(p,q);
-
-            // convert the powerOfTen to a gazillion
-            Gazillion P1 = new Gazillion(Integer.toString(powerOfTen));
+            ac = RecursiveMultiplication(a,c);
+            bd = RecursiveMultiplication(b,d);
+            ad = RecursiveMultiplication(a,d);
+            bc = RecursiveMultiplication(b,c);
 
             // final output
-            Gazillion mul1,mul2,mul3,sub1,sub2,add1,add2;
+            Gazillion mul1,mul2,addA,addB,addC,mul4;
             mul1 = multiplier(P1, P1);      // powerOfTen * powerOfTen
             mul2 = multiplier(mul1, ac);    // powerOfTen * powerOfTen * ac
-            //sub1 = subGaz(pq,ac);           // pq - ac
-           // sub2 = subGaz(sub1,bd);         // pq - ac - bd
-           // mul3 = multiplier(P1, sub2);    // powerOfTen * ( pq - ac - bd )
-            //add1 = adder(mul2,mul3);        // powerOfTen * powerOfTen * ac + powerOfTen * ( pq - ac - bd )
-            //add2 = adder(add1,bd);          // powerOfTen * powerOfTen * ac + powerOfTen * ( pq - ac - bd ) + bd
-
-            Gazillion addA,addB,addC,mul4;
             addA = adder(ad,bc);  // ad + bc
             mul4 = multiplier(P1,addA); // powerOf10 * ( ad + bc )
             addB = adder(mul2,mul4); // powerOfTen * powerOfTen * ac + powerOf10 * ( ad + bc )
             addC = adder(addB,bd); //powerOfTen * powerOfTen * ac + powerOf10 * ( ad + bc ) + bd
 
             product = addC;
-
-            // powerOf10*powerOf10*ac + powerOf10*(ad+bc) + bd
-            //product = add2;
-            //powerOfTen*powerOfTen*ac + powerOfTen*(pq-ac-bd) + bd
         }
 
        return product;
@@ -682,11 +392,12 @@ public class Gazillion {
      */
     public int recursiveMultiplication (int x, int y){
 
+        int product;
         int N = (int) Math.log10(x)+1; //number of digits in x (and y)
         int a, b, c, d;
 
         if (N == 1){
-            return x*y;
+            product = x*y;
         } else {
             int powerOfTen = (int) Math.pow(10,N/2);
             a = x / powerOfTen; // left half of x
@@ -704,8 +415,9 @@ public class Gazillion {
             int q = c+d;
             int pq = recursiveMultiplication(p,q);
 
-            return powerOfTen*powerOfTen*ac + powerOfTen*(pq-ac-bd) + bd;
+            product = powerOfTen*powerOfTen*ac + powerOfTen*(pq-ac-bd) + bd;
         }
+        return product;
     }
 
     /** Driver */
@@ -737,20 +449,12 @@ public class Gazillion {
         Gazillion gazillion = new Gazillion("0");
         System.out.println("Lab (int recursiveMultiplication()): " + gazillion.recursiveMultiplication(9788,9999)+"\n");
 
-
-        // test subtraction
-        Gazillion gazillion1 = new Gazillion("9798298283984209823944820970792685297384298249828402");
-        Gazillion gazillion2 = new Gazillion("2424245242988922424339283493752037827348728782472787");
-        gazillion1.sub(gazillion2);
-        System.out.println("Subtraction: " + gazillion1.toString()+"\n");
-
         // test Gazillion RecursiveMultiplication()
-        System.out.println("\n\n");
-        Gazillion omega = new Gazillion("9788");
-        Gazillion theta = new Gazillion("9999");
+        Gazillion omega = new Gazillion("9798298283984209");
+        Gazillion theta = new Gazillion("2424245242988922");
         Gazillion test = new Gazillion("1");
-        omega = omega.RecursiveMultiplication(theta,omega);
-        System.out.println(omega.toString()+"\n");
+        test = test.RecursiveMultiplication(theta,omega);
+        System.out.println("recursive: "+ test.toString()+"\n");
 
 
     } // main
