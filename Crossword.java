@@ -1,6 +1,5 @@
 import java.io.*;
 import java.net.URL;
-import java.sql.SQLOutput;
 import java.util.*;
 
 public class Crossword {
@@ -10,10 +9,13 @@ public class Crossword {
      *              2. put the words in a hashmap according to their length
      */
 
-    private HashMap<Integer, ArrayList<String>> mapWords = new HashMap<>(); // put the words into this hashmap according to their length
+
+    private String [] wordsArray; // array to store all the words from the words.txt file
+    private String [][] puzzle; // two dimensional array to take the dimension of the puzzle
+
 
     /**
-     * method to import the words from the words.txt file into a hashmap according to their length
+     * method to store the words from the words.txt file into an array using the URL to the file
      */
     public void importWords(){
         StringBuilder str = new StringBuilder();
@@ -32,34 +34,46 @@ public class Crossword {
             System.out.println("URL not found.");
         }
 
-        // separate words by line and remove punctuation
-        String[] words = str.toString().replaceAll("[^a-zA-Z ]", "").split("\n"); // every word from the file in this String[]
+        // separate words by line
+        String[] words = str.toString().split("\n"); // every word from the file in this String[]
+        wordsArray = words;
 
-        // remove duplicate and store into an arrayList
-        ArrayList <String> wordsList = new ArrayList<>();
-        for (int i = 0; i < words.length; i++){
-            if(!wordsList.contains(words[i])){
-                wordsList.add(words[i]);
-            }
-        }
-
-        // place words into a hashmap according to their values
     }
 
 
+    /**
+     * Method to build a puzzle. It will select a word at random and place it in the middle row.
+     * It will block the cells before and after the first inputted word, and then randomly block other cells of the puzzle.
+     * And it will insert words in the puzzle to complete it.
+     */
+    public void buildCrossword(){
+
+    }
+
+
+    /**
+     * Method to display the puzzle, its clues, its dimensions, the number of words it contains,
+     * and the percentage of blocked cells.
+     */
+    public void showCrossword(){
+
+    }
+
+
+    /**
+     * Method to interact with the user.
+     */
+    public void driver(){
+
+    }
+
+
+    // temporary test
     public static void main(String[] args) {
-       /* String [] alpha = new String[4];
-        alpha[0]="a";
-        alpha[1]="b";
-        alpha[2]="a";
-        alpha[3]="d";
 
-        List<String> beta = Arrays.asList(alpha.clone());
-        System.out.println(beta.indexOf("a"));*/
-
-
-
-
+        Crossword demo = new Crossword();
+        demo.importWords();
+        System.out.println(demo.wordsArray[400000]);
 
     }
 
