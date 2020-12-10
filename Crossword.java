@@ -1,6 +1,5 @@
 import java.io.*;
 import java.net.URL;
-import java.sql.SQLOutput;
 import java.util.*;
 
 public class Crossword {
@@ -9,7 +8,7 @@ public class Crossword {
     private String [][] puzzle; // two dimensional array to take the dimension of the puzzle
     private int numberOfRows; // number of rows in the puzzle
     private int numberOfColumns; // number of columns in the puzzle
-    private ArrayList <String> horizontalWords = new ArrayList<>();
+    private ArrayList<String> wordsInPuzzle = new ArrayList(); // keep track of the words that are in the current puzzle
 
 
     /**
@@ -37,7 +36,7 @@ public class Crossword {
         wordsArray = words;
 
         return wordsArray;
-    }
+    } // end of importWords()
 
 
     /**
@@ -49,10 +48,10 @@ public class Crossword {
      * @param columns is the number of columns in the 2 dimensional array
      */
     public void buildCrossword(int rows, int columns){
-       // importWords();
         numberOfRows = rows;
         numberOfColumns = columns;
 
+        // initialize puzzle
         puzzle = new String[rows][columns];
 
         // random int from 0 to the number of words in the words.txt file
@@ -78,8 +77,6 @@ public class Crossword {
         while (true) {
             // if word fits and word has more than one character
             spacing = (int) Math.ceil((columns - wordsArray[randInt].length())/2.0); // number of cells to skip in the row
-            System.out.println(wordsArray[randInt]);
-            System.out.println(wordsArray[randInt].length());
             if (wordsArray[randInt].length() <= columns && wordsArray[randInt].length() > 1) {
                 for (int i = 0; i < wordsArray[randInt].length(); i++) {
                     puzzle[middleRow][i + spacing] = Character.toString(wordsArray[randInt].charAt(i));
@@ -127,8 +124,7 @@ public class Crossword {
         int numberOfCell = rows * columns;
         double percentageOfBlocked = (random.nextInt(16) + 10) / 100.0; // the percentage of blocked cells will be from 10 to 25%
         int numberOfBlockedCells = (int)(numberOfCell * percentageOfBlocked);
-        int maxBlockedCellsPerRow = (int)(0.25*rows);
-        System.out.println("num = " + numberOfBlockedCells);
+
 
         // block random cells in the middle row, if permitted. i.e. if there are enough cells
         for (int i = 1; i < columns-1; i++){
@@ -174,16 +170,10 @@ public class Crossword {
             }
         }
 
-        for (String [] s : puzzle){
-            System.out.println(Arrays.toString(s));
-        }
-
-        System.out.println();
         // insert words in the puzzle.
         // if the number of consecutive cells available in a row is greater than the longest word that can be inserted,
         // put a block in the middle of the consecutive cells and try to insert a word.
         int cells = 0;
-        ArrayList <Integer> cell = new ArrayList<>();
         String currentWord = "";
         int next = 0;
         for (int i = 0; i < rows; i++){
@@ -219,12 +209,10 @@ public class Crossword {
                             int middleAvailableCell = (j+cells+j) / 2;
                             puzzle [i][middleAvailableCell] = "block";
                             blockedCells++;
-                            System.out.println("added blocked cell on row " + i + " column " + middleAvailableCell);
                         } else if (currentWord.length() == cells){
                             found = true;
                         }
                     }
-                    cell.add(cells);
                     // insert word in the available cells
                     int index = 0;
                     for (int k = j; k < j+cells; k++){
@@ -238,16 +226,7 @@ public class Crossword {
             }
         }
 
-        horizontalWords = wordsUsed;
-
-
-        System.out.println(blockedCells);
-        System.out.println(wordsUsed);
-        System.out.println(cell);
-
-       // return puzzle;
-
-    }
+    } // end of buildCrossword()
 
 
     /**
@@ -257,12 +236,7 @@ public class Crossword {
     public void showCrossword(){
         System.out.println();
 
-        System.out.println("\n\n");
-
-
-
-        // number of cells that will contain a numbering in the puzzle
-        int numbering = 0;
+        // cells that will contain a numbering in the puzzle
         for (int i = 0; i < numberOfRows; i++){
             for (int j = 0 ; j < numberOfColumns; j++){
                 // top row. If the cell under a given cell is blocked, don't number the given cell.
@@ -270,28 +244,23 @@ public class Crossword {
                 if(i == 0 && !puzzle[i][j].equals("block")){
                     if ((numberOfRows>2 && !puzzle[i+1][j].equals("block")) || (j!=numberOfColumns-1 && !puzzle[i][j+1].equals("block") && (j != 0 && puzzle[i][j-1].equals("block")))
                         || (j==0)) {
-                        numbering++;
-                        puzzle[i][j] = puzzle[i][j].concat("1");
+                        puzzle[i][j] = puzzle[i][j].concat("1"); // append string for reference later
                     }
                 }
                 // first column. If the given cell is blocked, don't number it.
                 else if(i!=0 && j==0 && !puzzle[i][j].equals("block")){
-                    numbering++;
                     puzzle[i][j] = puzzle[i][j].concat("2");
                 }
                 // below a blocked cell AND above a blocked cell
                 else if ((i!=0 && j!=0) && i != numberOfRows-1 && !puzzle[i][j].equals("block") && (puzzle[i-1][j].equals("block") && puzzle[i+1][j].equals("block"))){
                     // if the cell before the given cell is blocked, number the given cell
                     if (puzzle[i][j-1].equals("block")){
-                        numbering++;
                         puzzle[i][j] = puzzle[i][j].concat("3");
                     }
-                    // if the cell after the given cell is blocked, don't number the given cell
                 }
                 // below a blocked cell AND after a blocked cell.
                 // number the given cell only once
                 else if ((i!=0 && j!=0) && !puzzle[i][j].equals("block") && (puzzle[i][j-1].equals("block") && puzzle[i-1][j].equals("block"))){
-                    numbering++;
                     puzzle[i][j] = puzzle[i][j].concat("4");
                 }
                 // below a blocked cell
@@ -300,16 +269,13 @@ public class Crossword {
                     // if the cell following the given cell is blocked, don't number the given cell, unless the given cell has more than
                     // two cells below it.
                     if (i!=numberOfRows-1 && (j == numberOfColumns - 1 || !puzzle[i][j + 1].equals("block"))) {
-                        numbering++;
                         puzzle[i][j] = puzzle[i][j].concat("5");
-                    } else if (i<numberOfRows-2 && !puzzle[i+1][j].equals("block")){
-                        numbering++;
+                    } else if (i<=numberOfRows-2 && !puzzle[i+1][j].equals("block")){
                         puzzle[i][j] = puzzle[i][j].concat("5");
                     }
                 }
                 // after a blocked cell
                 else if ((j!=numberOfColumns-1 && i!=0 && j!=0) && !puzzle[i][j].equals("block") && puzzle[i][j-1].equals("block")){
-                    numbering++;
                     puzzle[i][j] = puzzle[i][j].concat("6");
                 }
 
@@ -317,12 +283,9 @@ public class Crossword {
         }
 
 
-        System.out.println();
-
         // display the puzzle
         String grid = ("+" + "-".repeat(8)).repeat(numberOfColumns) + "+";
         int num = 0;
-        String current = "|";
         for (int i = 0; i < numberOfRows; i++){
             System.out.println(grid);
             System.out.print("|");
@@ -348,10 +311,11 @@ public class Crossword {
             }
             System.out.println();
         }
-        System.out.println(grid); // close the puzzle
+        System.out.println(grid +"\n"); // close the puzzle
 
-        // clues
+        // CLUES
         // get the cells numbering
+        // the cells numbering will be used to keep track of the numbering of the displayed clues
         int [][] cellsNum = new int[numberOfRows][numberOfColumns];
         int currentNum = 0;
         for (int i = 0 ; i < numberOfRows; i++){
@@ -364,6 +328,7 @@ public class Crossword {
         }
         // across
         String word;
+        ArrayList<String> wordsUsed = new ArrayList<>();
         System.out.println("Across: ");
         // assess the puzzle to find the across words
         for(int i = 0; i < numberOfRows; i++){
@@ -379,19 +344,24 @@ public class Crossword {
                     if (j == numberOfColumns-1 && puzzle[i][j].length()<3){ // last element of row
                         word = word.concat(Character.toString(puzzle[i][j].charAt(0)));
                     }
-                    word = word.toLowerCase().toLowerCase();
+                    word = word.toLowerCase().toLowerCase(); // format string
                     String finalWord = word.substring(0,1).toUpperCase() + word.substring(1);
-                    System.out.println(cellsNum[i][beginningOfWord] + ". " + finalWord);
+                    wordsInPuzzle.add(finalWord); // add word to arraylist of words used
+                    finalWord = (cellsNum[i][beginningOfWord] + ". " + finalWord);
+                    wordsUsed.add(finalWord);
+                    System.out.println(finalWord);
                 }
             }
         }
+
+        System.out.println();
 
         //down
         ArrayList<String> downWords = new ArrayList<>();
         System.out.println("Down: ");
         for (int i = 0 ; i < numberOfColumns; i++){
             for (int j = 0 ; j < numberOfRows; j++){
-                if(j<numberOfRows-2 && puzzle[j][i].length()<3 && puzzle[j+1][i].length()<3){
+                if(j<=numberOfRows-2 && puzzle[j][i].length()<3 && puzzle[j+1][i].length()<3){
                     word = "";
                     int beginningOfWord = j;
                     do{
@@ -401,45 +371,179 @@ public class Crossword {
                     if (j == numberOfRows-1 && puzzle[j][i].length()<3){ // last element of column
                         word = word.concat(Character.toString(puzzle[j][i].charAt(0)));
                     }
-                    word = word.toLowerCase().toLowerCase();
+                    word = word.toLowerCase().toLowerCase(); // format string
                     String finalWord = word.substring(0,1).toUpperCase() + word.substring(1);
+                    wordsInPuzzle.add(finalWord); // add word to list of words used
                     downWords.add(cellsNum[beginningOfWord][i] + ". " + finalWord);
                 }
             }
         }
-        Collections.sort(downWords);
-        for (String s: downWords){
-            System.out.println(s);
+
+        // call method "sort" to display the down words in ascending order.
+        sort(downWords);
+
+        // dimensions
+        System.out.println("\nNumber of rows: " + numberOfRows);
+        System.out.println("Number of columns: " + numberOfColumns);
+        System.out.println("Total number of cells: " + numberOfRows*numberOfColumns);
+
+        // number of words in the puzzle
+        int total = wordsUsed.size() + downWords.size();
+        System.out.println("Total number of words: " + total);
+
+        // percentage of blocked cells
+        int blockCount = 0;
+        for(int i = 0; i < numberOfRows; i++){
+            for(int j = 0; j < numberOfColumns; j++){
+                if(puzzle[i][j].equals("block")){
+                    blockCount++;
+                }
+            }
+        }
+        int blockedPercentage = (blockCount*100)/(numberOfRows*numberOfColumns);
+        System.out.println("Percentage of blocked cells: " + blockedPercentage + " %\n");
+
+    } // end of showCrossword()
+
+
+    /**
+     * Method that takes an arrayList and sorts its elements according to the numbers in the beginning of each element.
+     * @param words is the arrayList to be sorted
+     */
+    private void sort(ArrayList<String> words){
+        // isolate the numbers in another arrayList
+        ArrayList<Integer> rank = new ArrayList<>();
+        for (int i = 0; i < words.size(); i++){
+            int index = 0;
+            String current = "";
+            while (words.get(i).charAt(index)!='.'){
+                current = current.concat(Character.toString(words.get(i).charAt(index)));
+                index++;
+            }
+            rank.add(Integer.parseInt(current));
+        }
+        // put the ints and value in a hashmap
+        HashMap<Integer, String> map = new HashMap<>();
+        for(int i = 0 ; i < rank.size(); i++){
+            map.put(rank.get(i), words.get(i));
         }
 
-
-        ///////////////////
-        System.out.println();
-
-        for (String [] s : puzzle){
-            System.out.println(Arrays.toString(s));
+        // sort the keys of the hashmap & print
+        TreeMap<Integer, String> sorted = new TreeMap<>();
+        sorted.putAll(map);
+        for(Map.Entry<Integer,String> entry: sorted.entrySet()){
+            System.out.println(entry.getValue());
         }
-        System.out.println(numbering);
-
-    }
+    } // end of sort()
 
 
     /**
      * Method to interact with the user.
      */
     public void driver(){
+        Scanner keyboard = new Scanner(System.in);
+        System.out.println("Welcome user! \nCreate below your American styled crossword puzzle.\n");
+        boolean keepRunning = true;
+        // ask user for a valid number of rows ( any number greater than 0).
+        // ask user for a valid number of columns (any number greater than 1, because we are only allowed to input words that
+        // have more than 2 characters).
+        while (keepRunning) {
+            System.out.println("Enter your desired row number (any number greater than 0) ~Enter 0 to quit~: ");
+            int rows = keyboard.nextInt();
+            int columns;
+            if (rows == 0) { // if the user decides to quit
+                keepRunning = false;
+            } else {
+                System.out.println("Enter your desired column number (any number greater than 1) ~Enter 0 to quit~: ");
+                columns = keyboard.nextInt();
+                if (columns == 0) { // if the user decides to quit
+                    keepRunning = false;
+                } else if (columns == 1){
+                    while (columns == 1){
+                        System.out.println("One is not a valid input.");
+                        System.out.println("Enter your desired column number (any number greater than 1) ~Enter 0 to quit~: ");
+                        columns = keyboard.nextInt();
+                    }
+                }
+                if (columns > 1 && rows > 0){
+                    importWords();
+                    buildCrossword(rows, columns);
+                    showCrossword();
 
-    }
+                    // ask if user wishes to write cues to file
+                    System.out.println("\nWould you like to enter the cues of the displayed words into a file? (Y or N)");
+                    String file = keyboard.next();
+                    while (!file.equalsIgnoreCase("n") && !file.equalsIgnoreCase("y")){
+                        System.out.println("Invalid command. Please enter again.");
+                        System.out.println("Would you like to enter the cues of the displayed words into a file? (Y or N)");
+                        file = keyboard.next();
+                    }
+                    if (file.equalsIgnoreCase("y")){
+                        obtainCues();
+                    }
+
+                    // ask if user wishes to build another puzzle
+                    System.out.println("\n\nWould you like to build another crossword? (Y or N)");
+                    String ask = keyboard.next();
+                    while (!ask.equalsIgnoreCase("Y") && !ask.equalsIgnoreCase("N")){
+                        System.out.println("Invalid command. Please enter again.");
+                        System.out.println("Would you like to build another crossword? (Y or N)");
+                        ask = keyboard.next();
+                    }
+                    if (ask.equalsIgnoreCase("N")){
+                        keepRunning = false;
+                    }
+                }
+            }
+        } // end of creation of puzzle
+        System.out.println("Thank you for using this program. See you again!");
+    } // end of driver()
 
 
-    // temporary test
-    public static void main(String[] args) {
-
-        Crossword demo = new Crossword();
-        demo.importWords();
-        demo.buildCrossword(8,10);
-        demo.showCrossword();
-
-    }
+    /**
+     * Method to ask user to type cues for every word in puzzle
+     */
+    public void obtainCues(){
+        try {
+            File f = new File("crosswords_dictionary.txt");
+            if (!f.exists()) {
+                f.createNewFile(); // if file doesn't exist, create a new file
+            }
+            // get the words from the file
+            ArrayList<String> wordsInFile = new ArrayList<>();
+            FileReader fileReader = new FileReader(f);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            if(bufferedReader.readLine()!=null) {
+                while (bufferedReader.ready()) {
+                    wordsInFile.add(bufferedReader.readLine().split(",")[0]);
+                }
+            }
+            // check if the words used are already in the file
+            ArrayList <String> wordsNotInFile = new ArrayList<>();
+            for(int i = 0; i < wordsInPuzzle.size(); i++){
+                if (!wordsInFile.contains(wordsInPuzzle.get(i))){
+                    wordsNotInFile.add(wordsInPuzzle.get(i));
+                }
+            }
+            // input the cues
+            FileWriter fw = new FileWriter(f.getAbsoluteFile(), true); // append to file
+            BufferedWriter bufferedWriter = new BufferedWriter(fw);
+            Scanner keyboard = new Scanner(System.in);
+            System.out.println("Enter the corresponding cues: \n");
+            for (int i = 0; i < wordsNotInFile.size(); i++){
+                System.out.println("(enter 0 to quit) Enter the cues of the following word: " + wordsNotInFile.get(i));
+                String cue = keyboard.nextLine();
+                if(cue.equals("0")){
+                    break;
+                }
+                bufferedWriter.write(wordsNotInFile.get(i) + ", ");
+                bufferedWriter.write(cue + "\n");
+            }
+            bufferedWriter.close();
+        } catch (IOException e){
+            System.out.println("Error while handling the file.");
+            e.printStackTrace();
+        }
+    } // end of obtainCues()
 
 }
