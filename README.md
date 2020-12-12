@@ -36,6 +36,11 @@ _ 5/ return the union of two sets
 _ 6/ return the intersection of two sets
 
 - The format of the returned set is a string that represents a set without duplicates.
+
+
+<b>Crossword.java</b>
+
+- A class to create an American styled crossword with customable number of rows and columns, with words that are from a dictionary accessed via URL. The user interacts with the class to create a crossword and have the choice to create a .txt file to type in the clues for every word in the crossword. For now, only the <i>across</i> words are actual words from the dictionary. The <i>down</i> words are not defined yet.
 </html>
 
 
